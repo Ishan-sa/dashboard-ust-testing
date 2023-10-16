@@ -1,0 +1,217 @@
+.App {
+  text-align: center;
+}
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.note-username,
+.note-date {
+  font-weight: bold;
+  color: #363636; /* Example color */
+  margin-right: 10px;
+}
+
+.user-notes {
+  display: block;
+  margin-top: 5px;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.items-start {
+  align-items: flex-start;
+}
+
+.w-max {
+  width: max-content;
+}
+
+.bg-header-blue {
+  background-color: #003c68;
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+.uppercase {
+  text-transform: uppercase;
+}
+
+table thead tr,
+table thead th {
+  background-color: #003c68 !important;
+  color: #fff !important;
+}
+
+.text-white {
+  color: #fff;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-bold {
+  font-weight: bold;
+  color: #363636;
+}
+
+.custom-select-wrapper {
+  position: relative;
+  display: flex; /* or flex, depending on your layout */
+}
+
+.dropdown-icon {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #777; /* or any desired color */
+}
+
+.actionContainer {
+  display: flex;
+  border-left: 0;
+  gap: 10px;
+  align-items: center;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.appContainer {
+  display: flex;
+  flex-direction: column;
+  padding: 0 10px;
+  width: 100%;
+}
+
+.button-container {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  align-items: flex-end;
+  width: 100%;
+  margin: 20px 0;
+}
+
+.notes-td {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notes-div {
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.modalBodyContainer {
+  max-width: max-content;
+  word-wrap: break-word;
+}
+
+.main-sidebar-container {
+  gap: 20px;
+  text-align: center;
+  max-width: 250px;
+  height: 100vh;
+  padding: 10px 20px;
+  z-index: 50;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.child-sidebar-container {
+  background-color: #024b80;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 10px;
+  font-weight: bold;
+  padding: 10px 0px;
+  cursor: pointer;
+}
+
+p {
+  margin: 0 !important;
+}
+
+.main-app-container {
+  display: flex;
+}
+
+.page-content {
+  margin-left: 240px;
+  width: 100%;
+}
+
+a {
+  text-decoration: none;
+}
