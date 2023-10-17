@@ -3,6 +3,7 @@ import { Button, Modal } from "react-bootstrap";
 import { BiSolidDownArrow } from "react-icons/bi";
 import { ScheduleKeysToCheck } from "../../keysToCheck/keysToCheck";
 import { Site } from "../../models/schedule";
+import axios from "axios";
 
 function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
   const [formData, setFormData] = useState(new Site());
@@ -27,7 +28,7 @@ function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
     }
   }, [editingSite]);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (ScheduleKeysToCheck.some((key) => formData[key] === "")) {
@@ -44,28 +45,55 @@ function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
       currentDate.getMonth() + 1
     }/${currentDate.getFullYear()}`;
 
-    setSites((prevSites) => {
+    // setSites((prevSites) => {
+    //   if (editingSite) {
+    //     // Editing logic
+    //     return prevSites.map((site) =>
+    //       site.ticketNumber === editingSite.ticketNumber
+    //         ? { ...editingSite, ...formData }
+    //         : site
+    //     );
+    //   } else {
+    //     // Adding a new site logic
+    //     const newTicketNumber =
+    //       prevSites.length > 0 ? prevSites[0].ticketNumber + 1 : 10001;
+
+    //     const newSiteData = {
+    //       ...formData,
+    //       ticketNumber: newTicketNumber,
+    //       dateAssigned: formattedDate,
+    //     };
+
+    //     return [newSiteData, ...prevSites];
+    //   }
+    // });
+
+    try {
       if (editingSite) {
         // Editing logic
-        return prevSites.map((site) =>
-          site.ticketNumber === editingSite.ticketNumber
-            ? { ...editingSite, ...formData }
-            : site
+        const response = await axios.put(
+          `http://localhost:8888/api/sites/${editingSite.ticketNumber}`,
+          {
+            ...editingSite,
+            ...formData,
+          }
         );
+        console.log("Data updated:", response.data);
       } else {
         // Adding a new site logic
-        const newTicketNumber =
-          prevSites.length > 0 ? prevSites[0].ticketNumber + 1 : 10001;
-
         const newSiteData = {
           ...formData,
-          ticketNumber: newTicketNumber,
           dateAssigned: formattedDate,
         };
-
-        return [newSiteData, ...prevSites];
+        const response = await axios.post(
+          "http://localhost:8888/api/sites",
+          newSiteData
+        );
+        console.log("Data saved:", response.data);
       }
-    });
+    } catch (error) {
+      console.log("Error saving data:", error);
+    }
 
     handleClose();
 
