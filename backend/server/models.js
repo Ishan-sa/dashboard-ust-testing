@@ -3,7 +3,7 @@ import { Mongoose } from "mongoose";
 const scheduleSchema = new Mongoose.Schema({
   siteNumber: Number,
   analysisStatus: String,
-  incTicketNumbe: String,
+  incTicketNumber: String,
   xPEX: String,
   bridgeSupport: String,
   assignedTo: String,

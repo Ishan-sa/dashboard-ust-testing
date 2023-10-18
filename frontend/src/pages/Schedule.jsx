@@ -1,8 +1,9 @@
 import ScheduleTable from "../components/Table/ScheduleTable";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SiteModal from "../components/Modal/SiteModal";
 import { Button } from "react-bootstrap";
 import Papa from "papaparse";
+import axios from "axios";
 
 export default function Schedule() {
   const [sites, setSites] = useState([]);
@@ -61,6 +62,15 @@ export default function Schedule() {
       });
     }
   };
+
+  useEffect(() => {
+    // fetch data from mongodb
+    const fetchSites = async () => {
+      const { data } = await axios.get("http://localhost:8888/sites");
+      setSites(data);
+    };
+    fetchSites();
+  }, [sites]);
 
   return (
     <>

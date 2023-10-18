@@ -20,6 +20,8 @@ const schedule = Mongoose.model("schedule", scheduleSchema);
 
 // Create a new site
 router.post("/", async (req, res) => {
+  console.log("req.body", req.body);
+
   const newSite = new schedule(req.body);
   try {
     const savedSite = await newSite.save();

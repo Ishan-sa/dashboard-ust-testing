@@ -45,55 +45,55 @@ function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
       currentDate.getMonth() + 1
     }/${currentDate.getFullYear()}`;
 
-    // setSites((prevSites) => {
-    //   if (editingSite) {
-    //     // Editing logic
-    //     return prevSites.map((site) =>
-    //       site.ticketNumber === editingSite.ticketNumber
-    //         ? { ...editingSite, ...formData }
-    //         : site
-    //     );
-    //   } else {
-    //     // Adding a new site logic
-    //     const newTicketNumber =
-    //       prevSites.length > 0 ? prevSites[0].ticketNumber + 1 : 10001;
-
-    //     const newSiteData = {
-    //       ...formData,
-    //       ticketNumber: newTicketNumber,
-    //       dateAssigned: formattedDate,
-    //     };
-
-    //     return [newSiteData, ...prevSites];
-    //   }
-    // });
-
-    try {
+    setSites((prevSites) => {
       if (editingSite) {
         // Editing logic
-        const response = await axios.put(
-          `http://localhost:8888/api/sites/${editingSite.ticketNumber}`,
-          {
-            ...editingSite,
-            ...formData,
-          }
+        return prevSites.map((site) =>
+          site.ticketNumber === editingSite.ticketNumber
+            ? { ...editingSite, ...formData }
+            : site
         );
-        console.log("Data updated:", response.data);
       } else {
         // Adding a new site logic
+        const newTicketNumber =
+          prevSites.length > 0 ? prevSites[0].ticketNumber + 1 : 10001;
+
         const newSiteData = {
           ...formData,
+          ticketNumber: newTicketNumber,
           dateAssigned: formattedDate,
         };
-        const response = await axios.post(
-          "http://localhost:8888/api/sites",
-          newSiteData
-        );
-        console.log("Data saved:", response.data);
+
+        return [newSiteData, ...prevSites];
       }
-    } catch (error) {
-      console.log("Error saving data:", error);
-    }
+    });
+
+    // try {
+    //   if (editingSite) {
+    //     // Editing logic
+    //     const response = await axios.put(
+    //       `http://localhost:8888/sites/${editingSite.ticketNumber}`,
+    //       {
+    //         ...editingSite,
+    //         ...formData,
+    //       }
+    //     );
+    //     console.log("Data updated:", response.data);
+    //   } else {
+    //     // Adding a new site logic
+    //     const newSiteData = {
+    //       ...formData,
+    //       dateAssigned: formattedDate,
+    //     };
+    //     const response = await axios.post(
+    //       "http://localhost:8888/api/sites",
+    //       newSiteData
+    //     );
+    //     console.log("Data saved:", response.data);
+    //   }
+    // } catch (error) {
+    //   console.log("Error saving data:", error);
+    // }
 
     handleClose();
 

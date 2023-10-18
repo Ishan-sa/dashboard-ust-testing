@@ -34,7 +34,7 @@ function ScheduleTable({ sites, onDelete = () => {}, onEdit = () => {} }) {
   }
 
   function truncateNotes(notes) {
-    return notes.length > 50 ? notes.substring(0, 50) + "..." : notes;
+    return notes?.length > 50 ? notes?.substring(0, 50) + "..." : notes;
   }
 
   return (

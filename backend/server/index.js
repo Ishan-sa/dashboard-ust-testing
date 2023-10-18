@@ -13,6 +13,11 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use("/sites", routes);
 
+app.use((req, res, next) => {
+  console.log(`Received ${req.method} request for ${req.url}}`);
+  next();
+});
+
 mongoose
   .connect("mongodb://localhost:27017/dashboard-ust", {
     useNewUrlParser: true,
