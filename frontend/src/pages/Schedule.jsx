@@ -16,6 +16,12 @@ export default function Schedule() {
     setEditingSite(null);
   }
 
+  // function handleEdit(ticketNumber) {
+  //   const siteToEdit = sites.find((site) => site.ticketNumber === ticketNumber);
+  //   setEditingSite(siteToEdit);
+  //   setShowModal(true);
+  // }
+
   function handleEdit(ticketNumber) {
     const siteToEdit = sites.find((site) => site.ticketNumber === ticketNumber);
     setEditingSite(siteToEdit);

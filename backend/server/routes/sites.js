@@ -13,7 +13,7 @@ const scheduleSchema = new Mongoose.Schema({
   hoRequired: String,
   notes: String,
   hoEngineer: String,
-  dateCompleted: String,
+  dateComplete: String,
 });
 
 const schedule = Mongoose.model("schedule", scheduleSchema);
@@ -21,7 +21,6 @@ const schedule = Mongoose.model("schedule", scheduleSchema);
 // Create a new site
 router.post("/", async (req, res) => {
   console.log("req.body", req.body);
-
   const newSite = new schedule(req.body);
   try {
     const savedSite = await newSite.save();
@@ -43,7 +42,9 @@ router.get("/", async (req, res) => {
 });
 
 // update a site
-router.patch("/:id", getSite, async (req, res) => {
+// write a patch request to update a site by its id (_id) in the database
+
+router.patch("/:_id", getSite, async (req, res) => {
   Object.assign(res.site, req.body);
   try {
     const updatedSite = await res.site.save();
@@ -68,6 +69,10 @@ async function getSite(req, res, next) {
   res.site = site;
   next();
 }
+
+router.get("/:id", getSite, (req, res) => {
+  res.json(res.site);
+});
 
 // delete a site
 router.delete("/:id", getSite, async (req, res) => {
