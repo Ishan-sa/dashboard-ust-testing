@@ -11,7 +11,11 @@ import { useState } from "react";
  * @param {Schedule[]} params.sites
  * @return {*}
  */
-function ScheduleTable({ sites, onDelete = (incTicketNumber) => {}, onEdit = (incTicketNumber) => {} }) {
+function ScheduleTable({
+  sites,
+  onDelete = (incTicketNumber) => {},
+  onEdit = (incTicketNumber) => {},
+}) {
   const tableHeader = [
     "# Ticket",
     "Date Assigned",
@@ -94,7 +98,10 @@ function ScheduleTable({ sites, onDelete = (incTicketNumber) => {}, onEdit = (in
               <td>{site.dateComplete}</td>
               <td className="actionContainer">
                 <div>
-                  <BiEdit onClick={() => onEdit(site.incTicketNumber)} style={{ height: "30px", width: "30px", cursor: "pointer" }} />
+                  <BiEdit
+                    onClick={() => onEdit(site.incTicketNumber)}
+                    style={{ height: "30px", width: "30px", cursor: "pointer" }}
+                  />
                 </div>
                 <div>
                   <AiFillDelete

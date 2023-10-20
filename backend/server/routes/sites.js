@@ -43,13 +43,20 @@ router.get("/:siteNumber", async (req, res) => {
       return res.status(500).json({ message: err.message });
     }
   }
-  return res.status(404).json({ message: `Schedule with siteNumber=${req.params.siteNumber} not found.` });
+  return res
+    .status(404)
+    .json({
+      message: `Schedule with siteNumber=${req.params.siteNumber} not found.`,
+    });
 });
 
 router.patch("/:siteNumber", async (req, res) => {
   if (exists(req?.params?.siteNumber)) {
     try {
-      const document = await Schedule.updateBySiteNumber(req.params.siteNumber, req.body);
+      const document = await Schedule.updateBySiteNumber(
+        req.params.siteNumber,
+        req.body
+      );
       if (document !== null) {
         return res.json(document);
       }
@@ -57,7 +64,11 @@ router.patch("/:siteNumber", async (req, res) => {
       return res.status(500).json({ message: err.message });
     }
   }
-  return res.status(404).json({ message: `Schedule with siteNumber=${req.params.siteNumber} not found.` });
+  return res
+    .status(404)
+    .json({
+      message: `Schedule with siteNumber=${req.params.siteNumber} not found.`,
+    });
 });
 
 router.delete("/:siteNumber", async (req, res) => {
@@ -65,13 +76,19 @@ router.delete("/:siteNumber", async (req, res) => {
     try {
       const document = await Schedule.deleteBySiteNumber(req.params.siteNumber);
       if (document !== null) {
-        return res.json({ message: `Schedule with siteNumber=${req.params.siteNumber} successfully deleted.` });
+        return res.json({
+          message: `Schedule with siteNumber=${req.params.siteNumber} successfully deleted.`,
+        });
       }
     } catch (err) {
       return res.status(500).json({ message: err.message });
     }
   }
-  return res.status(404).json({ message: `Schedule with siteNumber=${req.params.siteNumber} not found.` });
+  return res
+    .status(404)
+    .json({
+      message: `Schedule with siteNumber=${req.params.siteNumber} not found.`,
+    });
 });
 
 module.exports = router;
