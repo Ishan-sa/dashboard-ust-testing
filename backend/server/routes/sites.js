@@ -43,11 +43,9 @@ router.get("/:siteNumber", async (req, res) => {
       return res.status(500).json({ message: err.message });
     }
   }
-  return res
-    .status(404)
-    .json({
-      message: `Schedule with siteNumber=${req.params.siteNumber} not found.`,
-    });
+  return res.status(404).json({
+    message: `Schedule with siteNumber=${req.params.siteNumber} not found.`,
+  });
 });
 
 router.patch("/:siteNumber", async (req, res) => {
@@ -64,11 +62,9 @@ router.patch("/:siteNumber", async (req, res) => {
       return res.status(500).json({ message: err.message });
     }
   }
-  return res
-    .status(404)
-    .json({
-      message: `Schedule with siteNumber=${req.params.siteNumber} not found.`,
-    });
+  return res.status(404).json({
+    message: `Schedule with siteNumber=${req.params.siteNumber} not found.`,
+  });
 });
 
 router.delete("/:siteNumber", async (req, res) => {
@@ -84,11 +80,9 @@ router.delete("/:siteNumber", async (req, res) => {
       return res.status(500).json({ message: err.message });
     }
   }
-  return res
-    .status(404)
-    .json({
-      message: `Schedule with siteNumber=${req.params.siteNumber} not found.`,
-    });
+  return res.status(404).json({
+    message: `Schedule with siteNumber=${req.params.siteNumber} not found.`,
+  });
 });
 
 module.exports = router;

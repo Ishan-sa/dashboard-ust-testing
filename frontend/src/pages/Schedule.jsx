@@ -10,7 +10,9 @@ import ScheduleTable from "../components/Table/ScheduleTable";
 export default function Schedule() {
   const [sites, setSites] = useState(/** @type {Schedule[]} */ ([]));
   const [showModal, setShowModal] = useState(false);
-  const [editingSite, setEditingSite] = useState(/** @type {Schedule|null} */ (null));
+  const [editingSite, setEditingSite] = useState(
+    /** @type {Schedule|null} */ (null)
+  );
   const [sortOrder, setSortOrder] = useState("desc");
 
   // fetch data from mongodb
@@ -32,14 +34,10 @@ export default function Schedule() {
     setEditingSite(null);
   }
 
-  // function handleEdit(incTicketNumber) {
-  //   const siteToEdit = sites.find((site) => site.incTicketNumber === incTicketNumber);
-  //   setEditingSite(siteToEdit);
-  //   setShowModal(true);
-  // }
-
   function handleEdit(incTicketNumber) {
-    const siteToEdit = sites.find((site) => site.incTicketNumber === incTicketNumber);
+    const siteToEdit = sites.find(
+      (site) => site.incTicketNumber === incTicketNumber
+    );
     setEditingSite(siteToEdit ?? null);
     setShowModal(true);
   }
@@ -50,11 +48,16 @@ export default function Schedule() {
   }
 
   async function handleDelete(incTicketNumber) {
-    const siteToDelete = sites.find((site) => site.incTicketNumber === incTicketNumber);
+    const siteToDelete = sites.find(
+      (site) => site.incTicketNumber === incTicketNumber
+    );
     if (siteToDelete !== undefined) {
-      const response = await fetch(`http://localhost:8888/sites/${siteToDelete.siteNumber}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `http://localhost:8888/sites/${siteToDelete.siteNumber}`,
+        {
+          method: "DELETE",
+        }
+      );
       fetchSites();
     }
   }
@@ -65,8 +68,26 @@ export default function Schedule() {
 
   const sortedSites =
     sortOrder === "desc" //
-      ? [...sites].sort((a, b) => a.incTicketNumber.localeCompare(b.incTicketNumber)).reverse()
-      : [...sites].sort((a, b) => a.incTicketNumber.localeCompare(b.incTicketNumber));
+      ? [...sites]
+          .sort((a, b) => a.incTicketNumber.localeCompare(b.incTicketNumber))
+          .reverse()
+      : [...sites].sort((a, b) =>
+          a.incTicketNumber.localeCompare(b.incTicketNumber)
+        );
+
+  const currentDate = () => {
+    const currentDate = new Date();
+    const formattedDate = `${currentDate.getDate()}/${
+      currentDate.getMonth() + 1
+    }/${currentDate.getFullYear()}`;
+    return formattedDate;
+  };
+
+  const sitesWithTicketNumberAndDateAssigned = sites.map((site, index) => ({
+    ...sortedSites[index],
+    ticketNumber: 10001 + index,
+    dateAssigned: currentDate(),
+  }));
 
   const handleCSVUpload = (event) => {
     const file = event.target.files[0];
@@ -75,7 +96,9 @@ export default function Schedule() {
         complete: (result) => {
           // console.log(result.data);
           const currentDate = new Date();
-          const formattedDate = `${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()}`;
+          const formattedDate = `${currentDate.getDate()}/${
+            currentDate.getMonth() + 1
+          }/${currentDate.getFullYear()}`;
           const parsedData = result.data.map((row, index) => ({
             ...row,
             incTicketNumber: 10001 + index,
@@ -99,14 +122,30 @@ export default function Schedule() {
             </Button>
           </div>
           <div>
-            <SiteModal setSites={setSites} editingSite={editingSite} show={showModal} handleClose={handleDoneEditing} addSite={addSite} />
+            <SiteModal
+              setSites={setSites}
+              editingSite={editingSite}
+              show={showModal}
+              handleClose={handleDoneEditing}
+              addSite={addSite}
+            />
           </div>
           <div>
-            <input type="file" accept=".csv" className="form-control" onChange={handleCSVUpload} />
+            <input
+              type="file"
+              accept=".csv"
+              className="form-control"
+              onChange={handleCSVUpload}
+            />
           </div>
         </div>
         <div className="flex">
-          <ScheduleTable sites={sortedSites} onDelete={handleDelete} onEdit={handleEdit} />
+          <ScheduleTable
+            // sites={sortedSites}
+            sites={sitesWithTicketNumberAndDateAssigned}
+            onDelete={handleDelete}
+            onEdit={handleEdit}
+          />
         </div>
       </div>
     </>
