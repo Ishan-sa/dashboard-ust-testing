@@ -1,90 +1,77 @@
 const express = require("express");
 const router = express.Router();
-const Mongoose = require("mongoose");
 
-const scheduleSchema = new Mongoose.Schema({
-  siteNumber: String,
-  analysisStatus: String,
-  incTicketNumber: String,
-  xPEX: String,
-  bridgeSupport: String,
-  assignedTo: String,
-  shift: String,
-  hoRequired: String,
-  notes: String,
-  hoEngineer: String,
-  dateComplete: String,
-});
+const { exists } = require("../lib/helpers");
+const Schedule = require("../database/Schedule");
+const { makeRandomSchedule } = require("../lib/models/Schedule");
 
-const schedule = Mongoose.model("schedule", scheduleSchema);
-
-// Create a new site
-router.post("/", async (req, res) => {
-  console.log("req.body", req.body);
-  const newSite = new schedule(req.body);
+router.get("/random", async (req, res) => {
   try {
-    const savedSite = await newSite.save();
-    res.status(201).json(savedSite);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-});
-
-// Get all sites
-router.get("/", async (req, res) => {
-  try {
-    const sites = await schedule.find();
-    console.log("sites", sites);
-    res.json(sites);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
-// update a site
-// write a patch request to update a site by its id (_id) in the database
-
-router.patch("/:_id", getSite, async (req, res) => {
-  Object.assign(res.site, req.body);
-  try {
-    const updatedSite = await res.site.save();
-    res.json(updatedSite);
-  } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-});
-
-// get a site
-async function getSite(req, res, next) {
-  let site;
-  try {
-    site = await schedule.findById(req.params.id);
-    if (site == null) {
-      return res.status(404).json({ message: "Cannot find site" });
-    }
+    const document = await Schedule.create(makeRandomSchedule());
+    return res.status(201).json(document);
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
-
-  res.site = site;
-  next();
-}
-
-router.get("/:id", getSite, (req, res) => {
-  res.json(res.site);
 });
 
-// delete a site
-router.delete("/:id", getSite, async (req, res) => {
+router.get("/", async (req, res) => {
   try {
-    await res.site.remove();
-    res.json({ message: "Deleted site" });
+    const documents = await Schedule.getAll();
+    return res.json(documents);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ message: err.message });
   }
 });
 
-// const sitesRouter = require("./sites");
-// app.use("/sites", sitesRouter);
+router.post("/", async (req, res) => {
+  try {
+    const document = await Schedule.create(req.body);
+    return res.status(201).json(document);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+});
+
+router.get("/:siteNumber", async (req, res) => {
+  if (exists(req?.params?.siteNumber)) {
+    try {
+      const document = await Schedule.getBySiteNumber(req.params.siteNumber);
+      if (document !== null) {
+        return res.json(document);
+      }
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
+  }
+  return res.status(404).json({ message: `Schedule with siteNumber=${req.params.siteNumber} not found.` });
+});
+
+router.patch("/:siteNumber", async (req, res) => {
+  if (exists(req?.params?.siteNumber)) {
+    try {
+      const document = await Schedule.updateBySiteNumber(req.params.siteNumber, req.body);
+      if (document !== null) {
+        return res.json(document);
+      }
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
+  }
+  return res.status(404).json({ message: `Schedule with siteNumber=${req.params.siteNumber} not found.` });
+});
+
+router.delete("/:siteNumber", async (req, res) => {
+  if (exists(req?.params?.siteNumber)) {
+    try {
+      const document = await Schedule.deleteBySiteNumber(req.params.siteNumber);
+      if (document !== null) {
+        return res.json({ message: `Schedule with siteNumber=${req.params.siteNumber} successfully deleted.` });
+      }
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
+  }
+  return res.status(404).json({ message: `Schedule with siteNumber=${req.params.siteNumber} not found.` });
+});
 
 module.exports = router;

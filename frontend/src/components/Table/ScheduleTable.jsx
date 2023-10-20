@@ -4,7 +4,14 @@ import { AiFillDelete } from "react-icons/ai";
 import ModalView from "../Modal/ModalView";
 import { useState } from "react";
 
-function ScheduleTable({ sites, onDelete = () => {}, onEdit = () => {} }) {
+/** @typedef {import('../../../../backend/src/models/Schedule').Schedule} Schedule */
+
+/**
+ * @param {object} params
+ * @param {Schedule[]} params.sites
+ * @return {*}
+ */
+function ScheduleTable({ sites, onDelete = (incTicketNumber) => {}, onEdit = (incTicketNumber) => {} }) {
   const tableHeader = [
     "# Ticket",
     "Date Assigned",
@@ -83,21 +90,17 @@ function ScheduleTable({ sites, onDelete = () => {}, onEdit = () => {} }) {
                 // handleShow={handleShow}
                 handleClose={handleClose}
               />
-
               <td>{site.hoEngineer}</td>
               <td>{site.dateComplete}</td>
               <td className="actionContainer">
                 <div>
-                  <BiEdit
-                    onClick={() => onEdit(site.ticketNumber)}
-                    style={{ height: "30px", width: "30px", cursor: "pointer" }}
-                  />
+                  <BiEdit onClick={() => onEdit(site.incTicketNumber)} style={{ height: "30px", width: "30px", cursor: "pointer" }} />
                 </div>
                 <div>
                   <AiFillDelete
                     onClick={(event) => {
                       event.stopPropagation();
-                      onDelete(site.ticketNumber);
+                      onDelete(site.incTicketNumber);
                     }}
                     style={{ height: "30px", width: "30px", cursor: "pointer" }}
                   />

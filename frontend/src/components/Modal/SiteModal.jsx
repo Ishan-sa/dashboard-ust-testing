@@ -1,30 +1,25 @@
-import React, { useState, useEffect } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { BiSolidDownArrow } from "react-icons/bi";
 import { ScheduleKeysToCheck } from "../../keysToCheck/keysToCheck";
-import { Site } from "../../models/schedule";
-import axios from "axios";
 
+import { makeEmptySchedule } from "../../lib/models/Schedule";
+/** @typedef {import('../../lib/models/Schedule').Schedule} Schedule */
+
+/**
+ * @param {object} params
+ * @param {Schedule|null} params.editingSite
+ * @return {*}
+ */
 function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
-  const [formData, setFormData] = useState(new Site());
+  const [formData, setFormData] = useState(makeEmptySchedule());
 
   useEffect(() => {
-    if (editingSite) {
+    if (editingSite !== null) {
       setFormData(editingSite);
     } else {
-      setFormData({
-        siteNumber: "",
-        analysisStatus: "Pending",
-        incTicketNumber: "",
-        xPEX: "OPEX",
-        bridgeSupport: "Yes",
-        assignedTo: "",
-        shift: "Day",
-        hoRequired: "Yes",
-        notes: "",
-        hoEngineer: "",
-        dateComplete: "",
-      });
+      setFormData(makeEmptySchedule());
     }
   }, [editingSite]);
 
@@ -41,37 +36,42 @@ function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
     }
 
     const currentDate = new Date();
-    const formattedDate = `${currentDate.getDate()}/${
-      currentDate.getMonth() + 1
-    }/${currentDate.getFullYear()}`;
+    const formattedDate = `${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()}`;
 
     try {
-      if (editingSite) {
+      if (editingSite !== null) {
         // Editing logic
-        const response = await axios.patch(
-          `http://localhost:8888/sites/${editingSite.ticketNumber}`,
-          {
-            // ...editingSite,
-            ...formData,
-          }
-        );
-        console.log("Data updated:", response.data);
+        const response = await fetch(`http://localhost:8888/sites/${editingSite.siteNumber}`, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+        const responseData = await response.json();
+        console.log(responseData);
+        // const response = await axios.patch(`http://localhost:8888/sites/${editingSite.incTicketNumber}`, {
+        //   // ...editingSite,
+        //   ...formData,
+        // });
+        // console.log('Data updated:', response.data);
       } else {
         // Adding a new site logic
-        const newSiteData = {
-          ...formData,
-          dateAssigned: formattedDate,
-        };
-        const response = await axios.post(
-          "http://localhost:8888/sites",
-          newSiteData,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-          }
-        );
-        console.log("Data saved:", response.data);
+        const response = await fetch(`http://localhost:8888/sites`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+        const responseData = await response.json();
+        console.log(responseData);
+        // const response = await axios.post('http://localhost:8888/sites', newSiteData, {
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //   },
+        // });
+        // console.log('Data saved:', response.data);
       }
     } catch (error) {
       console.log("Error saving data:", error);
@@ -114,9 +114,7 @@ function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
       <form onSubmit={handleSubmit} className="w-full">
         <Modal show={show} onHide={handleClose} size="xl">
           <Modal.Header closeButton>
-            <Modal.Title>
-              {editingSite ? "Edit Site" : "Add a New Site"}
-            </Modal.Title>
+            <Modal.Title>{editingSite ? "Edit Site" : "Add a New Site"}</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <table className="table form-control">
@@ -324,8 +322,8 @@ function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
                       Notes
                     </label>
                     <textarea
-                      cols="400"
-                      rows="3"
+                      cols={400}
+                      rows={3}
                       className="form-control"
                       value={formData.notes}
                       onChange={(e) =>
@@ -381,9 +379,7 @@ function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
             </table>
             {error && (
               <div>
-                <p className="text-danger text-bold">
-                  Fields marked with an asterisk (*) are required.
-                </p>
+                <p className="text-danger text-bold">Fields marked with an asterisk (*) are required.</p>
               </div>
             )}
           </Modal.Body>

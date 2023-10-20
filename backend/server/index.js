@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 app.use("/sites", routes);
 
 app.use((req, res, next) => {
-  console.log(`Received ${req.method} request for ${req.url}}`);
+  console.log(`Received ${req.method} request for ${req.url}`);
   next();
 });
 

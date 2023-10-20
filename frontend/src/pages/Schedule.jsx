@@ -1,50 +1,72 @@
-import ScheduleTable from "../components/Table/ScheduleTable";
-import { useState, useEffect } from "react";
-import SiteModal from "../components/Modal/SiteModal";
-import { Button } from "react-bootstrap";
+import { useEffect, useState } from "react";
 import Papa from "papaparse";
-import axios from "axios";
+import { Button } from "react-bootstrap";
+
+import SiteModal from "../components/Modal/SiteModal";
+import ScheduleTable from "../components/Table/ScheduleTable";
+
+/** @typedef {import('../lib/models/Schedule').Schedule} Schedule */
 
 export default function Schedule() {
-  const [sites, setSites] = useState([]);
+  const [sites, setSites] = useState(/** @type {Schedule[]} */ ([]));
   const [showModal, setShowModal] = useState(false);
-  const [editingSite, setEditingSite] = useState(null);
+  const [editingSite, setEditingSite] = useState(/** @type {Schedule|null} */ (null));
   const [sortOrder, setSortOrder] = useState("desc");
+
+  // fetch data from mongodb
+  const fetchSites = async () => {
+    const response = await fetch("http://localhost:8888/sites");
+    /** @type {Schedule[]} */
+    const data = await response.json();
+    console.log(data);
+    setSites(data);
+  };
+
+  // componentDidMount
+  useEffect(() => {
+    fetchSites();
+  }, []);
 
   function addSite() {
     setShowModal(true);
     setEditingSite(null);
   }
 
-  // function handleEdit(ticketNumber) {
-  //   const siteToEdit = sites.find((site) => site.ticketNumber === ticketNumber);
+  // function handleEdit(incTicketNumber) {
+  //   const siteToEdit = sites.find((site) => site.incTicketNumber === incTicketNumber);
   //   setEditingSite(siteToEdit);
   //   setShowModal(true);
   // }
 
-  function handleEdit(ticketNumber) {
-    const siteToEdit = sites.find((site) => site.ticketNumber === ticketNumber);
-    setEditingSite(siteToEdit);
+  function handleEdit(incTicketNumber) {
+    const siteToEdit = sites.find((site) => site.incTicketNumber === incTicketNumber);
+    setEditingSite(siteToEdit ?? null);
     setShowModal(true);
   }
 
-  function handleDelete(ticketNumber) {
-    setSites((prevSites) =>
-      prevSites.filter((site) => site.ticketNumber !== ticketNumber)
-    );
+  function handleDoneEditing() {
+    setShowModal(false);
+    fetchSites();
+  }
+
+  async function handleDelete(incTicketNumber) {
+    const siteToDelete = sites.find((site) => site.incTicketNumber === incTicketNumber);
+    if (siteToDelete !== undefined) {
+      const response = await fetch(`http://localhost:8888/sites/${siteToDelete.siteNumber}`, {
+        method: "DELETE",
+      });
+      fetchSites();
+    }
   }
 
   function toggleSortOrder() {
     setSortOrder((prevOrder) => (prevOrder === "desc" ? "asc" : "desc"));
   }
 
-  const sortedSites = [...sites].sort((a, b) => {
-    if (sortOrder === "desc") {
-      return b.ticketNumber - a.ticketNumber;
-    } else {
-      return a.ticketNumber - b.ticketNumber;
-    }
-  });
+  const sortedSites =
+    sortOrder === "desc" //
+      ? [...sites].sort((a, b) => a.incTicketNumber.localeCompare(b.incTicketNumber)).reverse()
+      : [...sites].sort((a, b) => a.incTicketNumber.localeCompare(b.incTicketNumber));
 
   const handleCSVUpload = (event) => {
     const file = event.target.files[0];
@@ -53,12 +75,10 @@ export default function Schedule() {
         complete: (result) => {
           // console.log(result.data);
           const currentDate = new Date();
-          const formattedDate = `${currentDate.getDate()}/${
-            currentDate.getMonth() + 1
-          }/${currentDate.getFullYear()}`;
+          const formattedDate = `${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()}`;
           const parsedData = result.data.map((row, index) => ({
             ...row,
-            ticketNumber: 10001 + index,
+            incTicketNumber: 10001 + index,
             dateAssigned: formattedDate,
           }));
 
@@ -68,15 +88,6 @@ export default function Schedule() {
       });
     }
   };
-
-  useEffect(() => {
-    // fetch data from mongodb
-    const fetchSites = async () => {
-      const { data } = await axios.get("http://localhost:8888/sites");
-      setSites(data);
-    };
-    fetchSites();
-  }, [sites]);
 
   return (
     <>
@@ -88,30 +99,14 @@ export default function Schedule() {
             </Button>
           </div>
           <div>
-            <SiteModal
-              setSites={setSites}
-              siteCount={sites.length}
-              editingSite={editingSite}
-              show={showModal}
-              handleClose={() => setShowModal(false)}
-              addSite={addSite}
-            />
+            <SiteModal setSites={setSites} editingSite={editingSite} show={showModal} handleClose={handleDoneEditing} addSite={addSite} />
           </div>
           <div>
-            <input
-              type="file"
-              accept=".csv"
-              className="form-control"
-              onChange={handleCSVUpload}
-            />
+            <input type="file" accept=".csv" className="form-control" onChange={handleCSVUpload} />
           </div>
         </div>
         <div className="flex">
-          <ScheduleTable
-            sites={sortedSites}
-            onDelete={handleDelete}
-            onEdit={handleEdit}
-          />
+          <ScheduleTable sites={sortedSites} onDelete={handleDelete} onEdit={handleEdit} />
         </div>
       </div>
     </>
