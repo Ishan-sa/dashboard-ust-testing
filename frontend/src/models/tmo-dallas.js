@@ -4,7 +4,8 @@ export class Site {
   siteID = "";
   xPEX = "";
   gc = "";
-  techAffected = "";
+  /** @type {{label: string; value: string}[]} */
+  techAffected = [];
   /** @type {{label: string; value: string}[]} */
   sector = [];
   category = "";

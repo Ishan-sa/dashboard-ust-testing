@@ -1,6 +1,5 @@
-const mongoose = require('mongoose');
-
-const Schedule = require('../lib/models/Schedule');
+const mongoose = require("mongoose");
+const Schedule = require("../lib/models/Schedule");
 
 const ScheduleSchema = new mongoose.Schema({
   siteNumber: String,
@@ -16,7 +15,7 @@ const ScheduleSchema = new mongoose.Schema({
   dateComplete: String,
 });
 
-const ScheduleModel = mongoose.model('schedule', ScheduleSchema);
+const ScheduleModel = mongoose.model("schedule", ScheduleSchema);
 
 /**
  * Creates a new Schedule document.
@@ -45,7 +44,10 @@ module.exports.getBySiteNumber = async function (siteNumber) {
 };
 
 module.exports.updateBySiteNumber = async function (siteNumber, data) {
-  return await ScheduleModel.findOneAndUpdate({ siteNumber }, Schedule.makePartialSchedule(data));
+  return await ScheduleModel.findOneAndUpdate(
+    { siteNumber },
+    Schedule.makePartialSchedule(data)
+  );
 };
 
 module.exports.deleteBySiteNumber = async function (siteNumber) {

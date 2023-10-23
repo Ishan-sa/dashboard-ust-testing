@@ -5,6 +5,15 @@ import Select from "react-select";
 import makeAnimated from "react-select/animated";
 import { Site } from "../../models/tmo-dallas";
 import { TMODallasKeysToCheck } from "../../keysToCheck/keysToCheck";
+import { makeEmptyTMOTable } from "../../lib/models/TMO-Main";
+
+/**@typedef {import('../../lib/models/TMO-Main').TMOMain} TMOMain */
+
+/**
+ * @param {object} params
+ * @param {TMOMain|null} params.editingTMOMain
+ * @return {*}
+ */
 
 export default function TMODallasModal({
   addSite,
@@ -28,26 +37,7 @@ export default function TMODallasModal({
     if (editingSite) {
       setFormData(editingSite);
     } else {
-      setFormData({
-        incTicketNumber: "",
-        status: "Open",
-        siteID: "",
-        xPEX: "CAPEX",
-        gc: "",
-        techAffected: "",
-        sector: [],
-        category: "PIM - Internal",
-        mcpsEng: "",
-        workLog: "",
-        case: [],
-        incAssignedTo: "PAG",
-        assignedGroup: "",
-        assignee: "",
-        dateAssigned: "",
-        dateReassigned: "",
-        pierStatus: "Assigned",
-        resolution: "",
-      });
+      setFormData(makeEmptyTMOTable());
     }
   }, [editingSite]);
 
@@ -59,7 +49,7 @@ export default function TMODallasModal({
     }
   });
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     // check validation
@@ -91,21 +81,54 @@ export default function TMODallasModal({
       ...formData,
     };
 
-    setSites((prevSites) => {
-      if (editingSite) {
+    try {
+      if (editingSite !== null) {
         // Editing logic
-        return prevSites.map((site) =>
-          site.incTicketNumber === editingSite.incTicketNumber
-            ? { ...editingSite, ...formData }
-            : site
+        const reponse = await fetch(
+          `http://localhost:8888/tmo-main/${editingSite.incTicketNumber}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newSiteData),
+          }
         );
+        const responseData = await reponse.json();
+        console.log(responseData);
       } else {
         // Adding a new site logic
-        return [newSiteData, ...prevSites];
+        const response = await fetch("http://localhost:8888/tmo-main", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
+        const responseData = await response.json();
+        console.log("Site added", responseData);
       }
-    });
+    } catch (error) {
+      console.log(error);
+    }
 
     handleClose();
+
+    // setSites((prevSites) => {
+    //   if (editingSite) {
+    //     // Editing logic
+    //     return prevSites.map((site) =>
+    //       site.incTicketNumber === editingSite.incTicketNumber
+    //         ? { ...editingSite, ...formData }
+    //         : site
+    //     );
+    //   } else {
+    //     // Adding a new site logic
+    //     return [newSiteData, ...prevSites];
+    //   }
+    // });
+
+    // handleClose();
 
     // reset form data
     setFormData({
@@ -114,7 +137,7 @@ export default function TMODallasModal({
       siteID: "",
       xPEX: "CAPEX",
       gc: "",
-      techAffected: "",
+      techAffected: [],
       sector: [],
       category: "PIM - Internal",
       mcpsEng: "",
