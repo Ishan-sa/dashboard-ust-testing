@@ -4,14 +4,16 @@ const cors = require("cors");
 const app = express();
 const apiPort = 8888;
 const mongoose = require("mongoose");
-const routes = require("./routes/sites");
+const siteRoute = require("./routes/sites");
+const tmoMainRoute = require("./routes/tmo-main");
 
 // import Schedule from "./models";
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 app.use(bodyParser.json());
-app.use("/sites", routes);
+app.use("/sites", siteRoute);
+app.use("/tmo-main", tmoMainRoute);
 
 app.use((req, res, next) => {
   console.log(`Received ${req.method} request for ${req.url}`);

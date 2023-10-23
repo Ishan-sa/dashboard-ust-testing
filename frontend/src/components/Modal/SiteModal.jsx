@@ -3,8 +3,8 @@ import React, { useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { BiSolidDownArrow } from "react-icons/bi";
 import { ScheduleKeysToCheck } from "../../keysToCheck/keysToCheck";
-
 import { makeEmptySchedule } from "../../lib/models/Schedule";
+
 /** @typedef {import('../../lib/models/Schedule').Schedule} Schedule */
 
 /**
@@ -12,6 +12,7 @@ import { makeEmptySchedule } from "../../lib/models/Schedule";
  * @param {Schedule|null} params.editingSite
  * @return {*}
  */
+
 function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
   const [formData, setFormData] = useState(makeEmptySchedule());
 
@@ -36,25 +37,25 @@ function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
     }
 
     const currentDate = new Date();
-    const formattedDate = `${currentDate.getDate()}/${currentDate.getMonth() + 1}/${currentDate.getFullYear()}`;
+    const formattedDate = `${currentDate.getDate()}/${
+      currentDate.getMonth() + 1
+    }/${currentDate.getFullYear()}`;
 
     try {
       if (editingSite !== null) {
         // Editing logic
-        const response = await fetch(`http://localhost:8888/sites/${editingSite.siteNumber}`, {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        });
+        const response = await fetch(
+          `http://localhost:8888/sites/${editingSite.siteNumber}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          }
+        );
         const responseData = await response.json();
         console.log(responseData);
-        // const response = await axios.patch(`http://localhost:8888/sites/${editingSite.incTicketNumber}`, {
-        //   // ...editingSite,
-        //   ...formData,
-        // });
-        // console.log('Data updated:', response.data);
       } else {
         // Adding a new site logic
         const response = await fetch(`http://localhost:8888/sites`, {
@@ -66,12 +67,6 @@ function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
         });
         const responseData = await response.json();
         console.log(responseData);
-        // const response = await axios.post('http://localhost:8888/sites', newSiteData, {
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //   },
-        // });
-        // console.log('Data saved:', response.data);
       }
     } catch (error) {
       console.log("Error saving data:", error);
@@ -114,7 +109,9 @@ function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
       <form onSubmit={handleSubmit} className="w-full">
         <Modal show={show} onHide={handleClose} size="xl">
           <Modal.Header closeButton>
-            <Modal.Title>{editingSite ? "Edit Site" : "Add a New Site"}</Modal.Title>
+            <Modal.Title>
+              {editingSite ? "Edit Site" : "Add a New Site"}
+            </Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <table className="table form-control">
@@ -379,7 +376,9 @@ function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
             </table>
             {error && (
               <div>
-                <p className="text-danger text-bold">Fields marked with an asterisk (*) are required.</p>
+                <p className="text-danger text-bold">
+                  Fields marked with an asterisk (*) are required.
+                </p>
               </div>
             )}
           </Modal.Body>

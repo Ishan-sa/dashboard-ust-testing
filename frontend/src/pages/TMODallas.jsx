@@ -1,16 +1,31 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "react-bootstrap";
 import TMODallasTable from "../components/Table/TMODallasTable";
 import TMODallasModal from "../components/Modal/TMODallasModal";
 import readXlsxFile from "read-excel-file";
 
+/** @typedef {import('../lib/models/TMO-Main').TMO-Main} TMOMain */
+
 export default function TMODallas() {
-  const [sites, setSites] = useState([]);
+  const [sites, setSites] = useState(/** @type {TMOMain[]} */ ([]));
   const [showModal, setShowModal] = useState(false);
-  const [editingSite, setEditingSite] = useState(null);
+  const [editingSite, setEditingSite] = useState(
+    /** @type {TMOMain|null} */ (null)
+  );
   const [sortOrder, setSortOrder] = useState("desc");
   const [editMode, setEditMode] = useState(false);
+
+  const fetchSites = async () => {
+    const response = await fetch("http://localhost:8888/tmo-main");
+    /** @type {TMOMain[]} */
+    const data = await response.json();
+    setSites(data);
+  };
+
+  useEffect(() => {
+    fetchSites();
+  }, []);
 
   function addSite() {
     setEditMode(true);
@@ -27,10 +42,25 @@ export default function TMODallas() {
     setShowModal(true);
   }
 
+  function handleDoneEditing() {
+    setShowModal(false);
+    fetchSites();
+  }
+
   function handleDelete(incTicketNumber) {
-    setSites((prevSites) =>
-      prevSites.filter((site) => site.incTicketNumber !== incTicketNumber)
+    const siteToDelete = sites.find(
+      (site) => site.incTicketNumber === incTicketNumber
     );
+    if (siteToDelete !== undefined) {
+      const response = fetch(
+        `http://localhost:8888/tmo-main/${siteToDelete.incTicketNumber}`,
+        {
+          method: "DELETE",
+        }
+      );
+      fetchSites(); // Refresh the table
+    }
+    fetchSites(); // Refresh the table
   }
 
   function toggleSortOrder() {
@@ -123,7 +153,7 @@ export default function TMODallas() {
           <div>
             <TMODallasModal
               show={showModal}
-              handleClose={() => setShowModal(false)}
+              handleClose={handleDoneEditing}
               addSite={addSite}
               sites={sites}
               setSites={setSites}
