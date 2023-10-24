@@ -2,6 +2,14 @@ import React, { useState } from "react";
 import { BiEdit } from "react-icons/bi";
 import { AiFillDelete } from "react-icons/ai";
 
+/** @typedef {import('../../../../backend/src/models/PO-Lookups')} PO */
+
+/**
+ * @param {object} params
+ * @param {PO[]} params.poLookups
+ * @return {*}
+ */
+
 export default function POLookupsTable({
   poLookups,
   onDelete = () => {},
@@ -12,20 +20,10 @@ export default function POLookupsTable({
     "Month",
     "Activity",
     "PO",
-    "Qnty",
+    "Quantity",
     "Actual",
     "Actions",
   ];
-
-  const [show, setShow] = useState(false);
-
-  function handleShow() {
-    setShow(true);
-  }
-
-  function handleClose() {
-    setShow(false);
-  }
 
   return (
     <>
@@ -44,7 +42,7 @@ export default function POLookupsTable({
               <td>{poLookup.month}</td>
               <td>{poLookup.activity}</td>
               <td>{poLookup.poNumber}</td>
-              <td>{poLookup.qnty}</td>
+              <td>{poLookup.quantity}</td>
               <td>{poLookup.actual}</td>
               <td className="actionContainer">
                 <BiEdit

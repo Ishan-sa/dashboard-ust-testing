@@ -57,7 +57,7 @@ export default function POLookupsModal({
     }
   }, [editingPo]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     // check validation
@@ -70,16 +70,46 @@ export default function POLookupsModal({
       ...formData,
     };
 
-    setPO((prevPO) => {
-      if (editingPo) {
-        const index = prevPO.findIndex((po) => po.po === editingPo.po);
-        const updatedPO = [...prevPO];
-        updatedPO[index] = newPoData;
-        return updatedPO;
+    // setPO((prevPO) => {
+    //   if (editingPo) {
+    //     const index = prevPO.findIndex((po) => po.po === editingPo.po);
+    //     const updatedPO = [...prevPO];
+    //     updatedPO[index] = newPoData;
+    //     return updatedPO;
+    //   } else {
+    //     return [...prevPO, newPoData];
+    //   }
+    // });
+
+    try {
+      if (editingPo !== null) {
+        // editing logic
+        const response = await fetch(
+          `http://localhost:8888/po-lookups/${editingPo.poNumber}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          }
+        );
+        const responseData = await response.json();
+        console.log("responseData from PO LOOKUP", responseData);
+        // setPO(responseData);
       } else {
-        return [...prevPO, newPoData];
+        // adding logic
+        const response = await fetch("http://localhost:8888/po-lookups", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
+        });
       }
-    });
+    } catch (error) {
+      console.log("Error saving data", error);
+    }
 
     setError(false);
     handleClose();
@@ -88,43 +118,6 @@ export default function POLookupsModal({
     setFormData(new PO());
     console.log("handleSubmit", formData);
   };
-
-  /* useEffect(() => {
-    const po = PORef.current;
-    const qnty = QuantityRef.current;
-    const actual = ActualRef.current;
-
-    const forceNumericInput = (event) => {
-      event.target.value = event.target.value.replace(/[^0-9]/g, "");
-    };
-
-    if (po) {
-      po.addEventListener("input", forceNumericInput);
-    }
-
-    if (qnty) {
-      qnty.addEventListener("input", forceNumericInput);
-    }
-
-    if (actual) {
-      actual.addEventListener("input", forceNumericInput);
-    }
-
-    // Cleanup
-    return () => {
-      if (po) {
-        po.removeEventListener("input", forceNumericInput);
-      }
-
-      if (qnty) {
-        qnty.removeEventListener("input", forceNumericInput);
-      }
-
-      if (actual) {
-        actual.removeEventListener("input", forceNumericInput);
-      }
-    };
-  }, [formData]); */
 
   return (
     <>
@@ -261,11 +254,11 @@ export default function POLookupsModal({
                       type="text"
                       placeholder="Quantity"
                       className="form-control w-full"
-                      value={formData.qnty}
+                      value={formData.quantity}
                       onChange={(event) =>
                         setFormData((prev) => ({
                           ...prev,
-                          qnty: event.target.value,
+                          quantity: event.target.value,
                         }))
                       }
                       ref={QuantityRef}
