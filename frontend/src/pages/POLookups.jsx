@@ -1,12 +1,25 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import POLookupsTable from "../components/Table/POLookupsTable";
 import POLookupsModal from "../components/Modal/POLookupsModal";
 
+/** @typedef {import('../lib/models/po-lookup')} PO */
+
 export default function POLookups() {
-  const [poLookups, setPOLookups] = useState([]);
+  const [poLookups, setPOLookups] = useState(/** @type {PO[]} */ ([]));
   const [showModal, setShowModal] = useState(false);
-  const [editingPO, setEditingPO] = useState(null);
+  const [editingPO, setEditingPO] = useState(/** @type {PO|null} */ (null));
+
+  // fetch data from mongodb
+  const fetchPOLookups = async () => {
+    const response = await fetch("http://localhost:8888/po-lookups");
+    const data = await response.json();
+    setPOLookups(data);
+  };
+
+  useEffect(() => {
+    fetchPOLookups();
+  }, []);
 
   function addPO() {
     setShowModal(true);
@@ -17,17 +30,27 @@ export default function POLookups() {
     const poLookupToEdit = poLookups.find(
       (poLookup) => poLookup.poNumber === poNumberToEdit
     );
-
     if (poLookupToEdit) {
       setEditingPO(poLookupToEdit);
       setShowModal(true);
     }
   }
 
+  function handleDoneEditing() {
+    setShowModal(false);
+    fetchPOLookups();
+  }
+
   function handleDelete(poNumber) {
-    setPOLookups((prevPOLookups) => {
-      return prevPOLookups.filter((poLookup) => poLookup.poNumber !== poNumber);
-    });
+    const poLookupToDelete = poLookups.find(
+      (poLookup) => poLookup.poNumber === poNumber
+    );
+    if (poLookupToDelete !== undefined) {
+      fetch(`http://localhost:8888/po-lookups/${poLookupToDelete.poNumber}`, {
+        method: "DELETE",
+      });
+    }
+    fetchPOLookups();
   }
 
   return (
@@ -37,7 +60,7 @@ export default function POLookups() {
           <div>
             <POLookupsModal
               show={showModal}
-              handleClose={() => setShowModal(false)}
+              handleClose={handleDoneEditing}
               addPO={addPO}
               po={poLookups}
               editingPo={editingPO}

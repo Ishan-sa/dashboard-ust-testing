@@ -33,6 +33,6 @@ export const POLookupsKeysToCheck = [
   "month",
   "activity",
   "poNumber",
-  "qnty",
+  "quantity",
   "actual",
 ];
