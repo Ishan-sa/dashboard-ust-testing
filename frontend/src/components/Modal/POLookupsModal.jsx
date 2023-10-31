@@ -9,7 +9,6 @@ export default function POLookupsModal({
   editingPo,
   show,
   handleClose,
-  finalActualVal,
 }) {
   const [formData, setFormData] = useState(new PO());
   const [error, setError] = useState(false);
@@ -19,23 +18,7 @@ export default function POLookupsModal({
 
   const PORef = useRef(null);
   const QuantityRef = useRef(null);
-  const ActualRef = useRef(null);
 
-  // const monthOptions = [
-  //   { value: "Select", label: "Select" },
-  //   { value: "01", label: "January" },
-  //   { value: "02", label: "February" },
-  //   { value: "03", label: "March" },
-  //   { value: "04", label: "April" },
-  //   { value: "05", label: "May" },
-  //   { value: "06", label: "June" },
-  //   { value: "07", label: "July" },
-  //   { value: "08", label: "August" },
-  //   { value: "09", label: "September" },
-  //   { value: "10", label: "October" },
-  //   { value: "11", label: "November" },
-  //   { value: "12", label: "December" },
-  // ];
   const monthOptions = [
     { value: "Select", label: "Select" },
     { value: "January", label: "January" },
@@ -84,9 +67,22 @@ export default function POLookupsModal({
         );
         const responseData = await response.json();
         console.log("responseData from PO LOOKUP", responseData);
-        // setPO(responseData);
       } else {
         // adding logic
+        let month = monthToNumber(formData.month);
+        const tmoArray = await (
+          await fetch("http://localhost:8888/tmo-main/lookup", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              dateAssigned: formData.year + "-" + month,
+              xPEX: formData.activity,
+            }),
+          })
+        ).json();
+        formData.actual = tmoArray.length.toString();
         const response = await fetch("http://localhost:8888/po-lookups", {
           method: "POST",
           headers: {
@@ -105,9 +101,6 @@ export default function POLookupsModal({
 
     // reset form data
     setFormData(new PO());
-    compare();
-    // compareYearMonthXPEX();
-    // console.log("handleSubmit", formData);
   };
 
   // handleSubmit ends here
@@ -128,35 +121,6 @@ export default function POLookupsModal({
     setYears(yearsArray);
   }
 
-  const comboArray = [];
-  const comboOfYearMonthXPEX = async () => {
-    const response = await fetch("http://localhost:8888/tmo-main");
-    const data = await response.json();
-    const dateAssigned = data.map((item) => item.dateAssigned);
-    const years = dateAssigned.map((item) => item.slice(0, 4));
-    const months = dateAssigned.map((item) => item.slice(5, 7));
-    const xPEX = data.map((item) => item.xPEX);
-    // console.log("years", years);
-    // console.log("months", months);
-    // console.log("xPEX", xPEX);
-
-    // combine year, month, and xPEX into one array of objects
-    for (let i = 0; i < years.length; i++) {
-      comboArray.push({
-        year: years[i],
-        month: months[i],
-        xPEX: xPEX[i],
-      });
-    }
-    setCombo(comboArray);
-    console.log("Combo", combo);
-  };
-
-  // compare formData.year, formData.month, formData.activity to comboArray's year, month, xPEX
-  // if matches, set formData.actual to the total number of macthes
-  // if not matches, set formData.actual to 0
-  // the way this would work is that i need to send a post request to the backend /tmo-main/lookup, and i can send dateAssigned, and xPEX as the body of the request, this will only give me the matches, and then i can set formData.actual to the length of the response data from the backend
-
   const monthToNumber = (monthName) => {
     const months = [
       "January",
@@ -175,44 +139,6 @@ export default function POLookupsModal({
     return String(months.indexOf(monthName) + 1).padStart(2, "0");
   };
 
-  const compare = async () => {
-    let month = monthToNumber(formData.month);
-    const response = await fetch("http://localhost:8888/tmo-main/lookup", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        dateAssigned: formData.year + "-" + month,
-        xPEX: formData.activity,
-      }),
-    });
-    const data = await response.json();
-    setFormData((prev) => ({
-      ...prev,
-      actual: data.length,
-    }));
-    setActualVal(data.length);
-    console.log(`records found: ${data.length}`, data);
-    console.log("actualVal", actualVal);
-  };
-
-  // finalActualVal(actualVal);
-
-  // check if formData.year, formData.month, formData.activity matches comboArray's year, month, xPEX
-  // if matches, set formData.actual to the total number of macthes
-  // if not matches, set formData.actual to 0
-
-  const compareYearMonthXPEX = () => {
-    const matches = combo.filter(
-      (item) =>
-        item.year === formData.year &&
-        item.month === formData.month &&
-        item.xPEX === formData.activity
-    );
-    console.log("matches", matches);
-  };
-
   useEffect(() => {
     getYearMonthXPEX();
   }, []);
@@ -229,8 +155,6 @@ export default function POLookupsModal({
       >
         Add a PO{" "}
       </Button>
-
-      <button onClick={comboOfYearMonthXPEX}>Click</button>
 
       <form onSubmit={handleSubmit}>
         <Modal show={show} onHide={handleClose} size="xl">
