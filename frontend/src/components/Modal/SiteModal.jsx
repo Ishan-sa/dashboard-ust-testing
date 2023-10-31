@@ -15,6 +15,7 @@ import { makeEmptySchedule } from "../../lib/models/Schedule";
 
 function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
   const [formData, setFormData] = useState(makeEmptySchedule());
+  const [incTicketNumbers, setIncTicketNumbers] = useState([]);
 
   useEffect(() => {
     if (editingSite !== null) {
@@ -94,6 +95,21 @@ function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
 
   const [error, setError] = useState(false);
 
+  async function getIncTicketNumbersFromRTWP() {
+    const response = await fetch("http://localhost:8888/tmo-main");
+    const responseData = await response.json();
+    const incTicketNumbersFromMainTracker = responseData.map(
+      (site) => site.incTicketNumber
+    );
+    console.log(incTicketNumbersFromMainTracker);
+    setIncTicketNumbers(incTicketNumbersFromMainTracker);
+    // return response.data;
+  }
+
+  useEffect(() => {
+    getIncTicketNumbersFromRTWP();
+  }, []);
+
   return (
     <>
       <Button
@@ -167,19 +183,27 @@ function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
                       <span className="text-danger">*</span>
                       INC Ticket
                     </label>
-                    <input
-                      type="text"
-                      placeholder="INC Ticket Number"
-                      className="form-control w-full"
-                      required
-                      value={formData.incTicketNumber}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          incTicketNumber: e.target.value,
-                        }))
-                      }
-                    />
+                    <div className="custom-select-wrapper">
+                      <select
+                        className="form-control w-full"
+                        required
+                        value={formData.incTicketNumber}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            incTicketNumber: e.target.value,
+                          }))
+                        }
+                      >
+                        <option value="Select">Select</option>
+                        {incTicketNumbers.map((incTicketNumber) => (
+                          <option value={incTicketNumber}>
+                            {incTicketNumber}
+                          </option>
+                        ))}
+                      </select>
+                      <BiSolidDownArrow className="dropdown-icon" />
+                    </div>
                   </td>
                 </tr>
 

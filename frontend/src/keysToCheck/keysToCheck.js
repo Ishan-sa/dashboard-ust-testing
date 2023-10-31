@@ -34,5 +34,5 @@ export const POLookupsKeysToCheck = [
   "activity",
   "poNumber",
   "quantity",
-  "actual",
+  // "actual",
 ];

@@ -9,30 +9,33 @@ export default function POLookupsModal({
   editingPo,
   show,
   handleClose,
-  setPO,
+  finalActualVal,
 }) {
   const [formData, setFormData] = useState(new PO());
   const [error, setError] = useState(false);
+  const [years, setYears] = useState([]);
+  const [combo, setCombo] = useState([]);
+  const [actualVal, setActualVal] = useState(0);
 
   const PORef = useRef(null);
   const QuantityRef = useRef(null);
   const ActualRef = useRef(null);
 
-  const options = [
-    { value: "Select", label: "Select" },
-    { value: "2020", label: "2020" },
-    { value: "2021", label: "2021" },
-    { value: "2022", label: "2022" },
-    { value: "2023", label: "2023" },
-    { value: "2024", label: "2024" },
-    { value: "2025", label: "2025" },
-    { value: "2026", label: "2026" },
-    { value: "2027", label: "2027" },
-    { value: "2028", label: "2028" },
-    { value: "2029", label: "2029" },
-    { value: "2030", label: "2030" },
-  ];
-
+  // const monthOptions = [
+  //   { value: "Select", label: "Select" },
+  //   { value: "01", label: "January" },
+  //   { value: "02", label: "February" },
+  //   { value: "03", label: "March" },
+  //   { value: "04", label: "April" },
+  //   { value: "05", label: "May" },
+  //   { value: "06", label: "June" },
+  //   { value: "07", label: "July" },
+  //   { value: "08", label: "August" },
+  //   { value: "09", label: "September" },
+  //   { value: "10", label: "October" },
+  //   { value: "11", label: "November" },
+  //   { value: "12", label: "December" },
+  // ];
   const monthOptions = [
     { value: "Select", label: "Select" },
     { value: "January", label: "January" },
@@ -66,21 +69,6 @@ export default function POLookupsModal({
       return;
     }
 
-    const newPoData = {
-      ...formData,
-    };
-
-    // setPO((prevPO) => {
-    //   if (editingPo) {
-    //     const index = prevPO.findIndex((po) => po.po === editingPo.po);
-    //     const updatedPO = [...prevPO];
-    //     updatedPO[index] = newPoData;
-    //     return updatedPO;
-    //   } else {
-    //     return [...prevPO, newPoData];
-    //   }
-    // });
-
     try {
       if (editingPo !== null) {
         // editing logic
@@ -106,6 +94,7 @@ export default function POLookupsModal({
           },
           body: JSON.stringify(formData),
         });
+        console.log("Added a PO", formData);
       }
     } catch (error) {
       console.log("Error saving data", error);
@@ -116,8 +105,117 @@ export default function POLookupsModal({
 
     // reset form data
     setFormData(new PO());
-    console.log("handleSubmit", formData);
+    compare();
+    // compareYearMonthXPEX();
+    // console.log("handleSubmit", formData);
   };
+
+  // handleSubmit ends here
+
+  async function getYearMonthXPEX() {
+    const response = await fetch("http://localhost:8888/tmo-main");
+    const data = await response.json();
+    const dateAssigned = data.map((item) => item.dateAssigned);
+    const months = dateAssigned.map((item) => item.slice(5, 7));
+    const xPEX = data.map((item) => item.xPEX);
+
+    // Create a Set to remove duplicates
+    const uniqueYears = new Set(dateAssigned.map((item) => item.slice(0, 4)));
+
+    // Convert Set back to an array
+    const yearsArray = [...uniqueYears];
+
+    setYears(yearsArray);
+  }
+
+  const comboArray = [];
+  const comboOfYearMonthXPEX = async () => {
+    const response = await fetch("http://localhost:8888/tmo-main");
+    const data = await response.json();
+    const dateAssigned = data.map((item) => item.dateAssigned);
+    const years = dateAssigned.map((item) => item.slice(0, 4));
+    const months = dateAssigned.map((item) => item.slice(5, 7));
+    const xPEX = data.map((item) => item.xPEX);
+    // console.log("years", years);
+    // console.log("months", months);
+    // console.log("xPEX", xPEX);
+
+    // combine year, month, and xPEX into one array of objects
+    for (let i = 0; i < years.length; i++) {
+      comboArray.push({
+        year: years[i],
+        month: months[i],
+        xPEX: xPEX[i],
+      });
+    }
+    setCombo(comboArray);
+    console.log("Combo", combo);
+  };
+
+  // compare formData.year, formData.month, formData.activity to comboArray's year, month, xPEX
+  // if matches, set formData.actual to the total number of macthes
+  // if not matches, set formData.actual to 0
+  // the way this would work is that i need to send a post request to the backend /tmo-main/lookup, and i can send dateAssigned, and xPEX as the body of the request, this will only give me the matches, and then i can set formData.actual to the length of the response data from the backend
+
+  const monthToNumber = (monthName) => {
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    return String(months.indexOf(monthName) + 1).padStart(2, "0");
+  };
+
+  const compare = async () => {
+    let month = monthToNumber(formData.month);
+    const response = await fetch("http://localhost:8888/tmo-main/lookup", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        dateAssigned: formData.year + "-" + month,
+        xPEX: formData.activity,
+      }),
+    });
+    const data = await response.json();
+    setFormData((prev) => ({
+      ...prev,
+      actual: data.length,
+    }));
+    setActualVal(data.length);
+    console.log(`records found: ${data.length}`, data);
+    console.log("actualVal", actualVal);
+  };
+
+  // finalActualVal(actualVal);
+
+  // check if formData.year, formData.month, formData.activity matches comboArray's year, month, xPEX
+  // if matches, set formData.actual to the total number of macthes
+  // if not matches, set formData.actual to 0
+
+  const compareYearMonthXPEX = () => {
+    const matches = combo.filter(
+      (item) =>
+        item.year === formData.year &&
+        item.month === formData.month &&
+        item.xPEX === formData.activity
+    );
+    console.log("matches", matches);
+  };
+
+  useEffect(() => {
+    getYearMonthXPEX();
+  }, []);
 
   return (
     <>
@@ -131,6 +229,8 @@ export default function POLookupsModal({
       >
         Add a PO{" "}
       </Button>
+
+      <button onClick={comboOfYearMonthXPEX}>Click</button>
 
       <form onSubmit={handleSubmit}>
         <Modal show={show} onHide={handleClose} size="xl">
@@ -159,9 +259,10 @@ export default function POLookupsModal({
                         }
                         required
                       >
-                        {options.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
+                        <option value="Select">Select</option>
+                        {years.map((year, index) => (
+                          <option key={index} value={year}>
+                            {year}
                           </option>
                         ))}
                       </select>
@@ -265,26 +366,27 @@ export default function POLookupsModal({
                       required
                     />
                   </td>
-                  <td className="w-full">
+                  {/* <td className="w-full">
                     <label htmlFor="Actual" className="text-bold">
                       Actual
                     </label>
                     <span className="text-danger">*</span>
                     <input
+                      readOnly
                       type="text"
-                      placeholder="Actual"
+                      placeholder="Read Only"
                       className="form-control w-full"
-                      value={formData.actual}
                       onChange={(event) =>
                         setFormData((prev) => ({
                           ...prev,
                           actual: event.target.value,
                         }))
                       }
+                      value={formData.actual}
                       ref={ActualRef}
                       required
                     />
-                  </td>
+                  </td> */}
                 </tr>
               </tbody>
             </table>

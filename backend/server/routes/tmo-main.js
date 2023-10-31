@@ -4,6 +4,7 @@ const router = express.Router();
 const { exists } = require("../lib/helpers");
 const TMO_Main = require("../database/TMO-Main");
 const { makeRandomTMOTable } = require("../lib/models/TMO-Main");
+const { makePartialTMOTable } = require("../lib/models/TMO-Main");
 
 router.get("/randomTMO", async (req, res) => {
   try {
@@ -27,6 +28,15 @@ router.post("/", async (req, res) => {
   console.log("Request Body: ", req.body);
   try {
     const document = await TMO_Main.create(req.body);
+    return res.status(201).json(document);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+});
+
+router.post("/lookup", async (req, res) => {
+  try {
+    const document = await TMO_Main.lookup(req.body);
     return res.status(201).json(document);
   } catch (err) {
     return res.status(500).json({ message: err.message });

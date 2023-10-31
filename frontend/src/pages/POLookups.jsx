@@ -15,6 +15,7 @@ export default function POLookups() {
     const response = await fetch("http://localhost:8888/po-lookups");
     const data = await response.json();
     setPOLookups(data);
+    // setPOLookups({ ...data, actual: actualValue });
   };
 
   useEffect(() => {

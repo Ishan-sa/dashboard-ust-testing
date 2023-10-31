@@ -104,6 +104,20 @@ function makePartialTMOTable(data) {
 }
 
 /**
+ * @param {object} data
+ * @return {object}
+ */
+
+function makePartialRegexTMOTable(data) {
+  const partial = makeEmptyTMOTable();
+  for (const prop in partial) {
+    if (exists(data[prop])) partial[prop] = new RegExp(data[prop]);
+    else delete partial[prop];
+  }
+  return partial;
+}
+
+/**
  * Creates a TMOTable object with randomly generated values.
  *
  * @return {TMO-Main}
@@ -146,4 +160,5 @@ module.exports = {
   makeEmptyTMOTable,
   makePartialTMOTable,
   makeRandomTMOTable,
+  makePartialRegexTMOTable,
 };

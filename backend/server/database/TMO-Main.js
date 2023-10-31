@@ -67,3 +67,7 @@ module.exports.updateTMOByIncTicketNumber = async function (
 module.exports.deleteTMOByIncTicketNumber = async function (incTicketNumber) {
   return await TMO_MainModel.findOneAndDelete({ incTicketNumber });
 };
+
+module.exports.lookup = async function (data) {
+  return await TMO_MainModel.find(TMO_Main.makePartialRegexTMOTable(data));
+};
