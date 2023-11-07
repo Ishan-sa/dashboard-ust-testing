@@ -16,6 +16,7 @@ function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
   const [formData, setFormData] = useState(makeEmptySchedule());
   const [incTicketNumbers, setIncTicketNumbers] = useState([]);
   const [error, setError] = useState(false);
+  const [filteredIncTicketNumbers, setFilteredIncTicketNumbers] = useState([]);
 
   useEffect(() => {
     if (editingSite !== null) {
@@ -93,35 +94,31 @@ function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
     setError(false);
   };
 
-  // async function getIncTicketNumbersFromRTWP() {
-  //   const response = await fetch(`http://localhost:8888/tmo-main`);
-  //   const responseData = await response.json();
-  //   const incTicketNumbersFromMainTracker = responseData.map(
-  //     (site) => site.incTicketNumber
-  //   );
-  //   console.log(incTicketNumbersFromMainTracker);
-  //   setIncTicketNumbers(incTicketNumbersFromMainTracker);
-  // }
+  const updateFilteredTickets = async (siteNumber) => {
+    try {
+      const formattedSiteNumber = siteNumber.trim();
 
-  // useEffect(() => {
-  //   getIncTicketNumbersFromRTWP();
-  // }, []);
+      const url = `http://localhost:8888/tmo-main/site/${encodeURIComponent(
+        formattedSiteNumber
+      )}`;
 
-  async function getIncTicketNumbersFromRTWP() {
-    const response = await fetch(`http://localhost:8888/tmo-main`);
-    const responseData = await response.json();
-    // if the status is set to closed, then don't fetch the inc ticket number of that site from the main tracker
+      // Fetch data from the specific endpoint
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const siteData = await response.json();
+      const ticketsForSite = siteData
+        .filter((item) => item.status !== "Closed")
+        .map((item) => item.incTicketNumber);
 
-    const incTicketNumbersFromMainTracker = responseData.map(
-      (site) => site.incTicketNumber
-    );
-    console.log(incTicketNumbersFromMainTracker);
-    setIncTicketNumbers(incTicketNumbersFromMainTracker);
-  }
-
-  useEffect(() => {
-    getIncTicketNumbersFromRTWP();
-  }, []);
+      // Update the state with the fetched ticket numbers
+      setFilteredIncTicketNumbers(ticketsForSite);
+    } catch (error) {
+      console.error("Failed to fetch data for site:", siteNumber, error);
+      setFilteredIncTicketNumbers([]);
+    }
+  };
 
   return (
     <>
@@ -157,12 +154,19 @@ function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
                       placeholder="Site Number"
                       className="form-control"
                       value={formData.siteNumber}
-                      onChange={(e) =>
+                      // onChange={(e) =>
+                      //   setFormData((prev) => ({
+                      //     ...prev,
+                      //     siteNumber: e.target.value,
+                      //   }))
+                      // }
+                      onChange={(e) => {
                         setFormData((prev) => ({
                           ...prev,
                           siteNumber: e.target.value,
-                        }))
-                      }
+                        }));
+                        updateFilteredTickets(e.target.value);
+                      }}
                     />
                   </td>
 
@@ -198,24 +202,6 @@ function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
                       INC Ticket
                     </label>
                     <div className="custom-select-wrapper">
-                      {/* <select
-                        className="form-control w-full"
-                        required
-                        value={formData.incTicketNumber}
-                        onChange={(e) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            incTicketNumber: e.target.value,
-                          }))
-                        }
-                      >
-                        <option value="Select">Select</option>
-                        {incTicketNumbers.map((incTicketNumber, i) => (
-                          <option value={incTicketNumber} key={i}>
-                            {incTicketNumber}
-                          </option>
-                        ))}
-                      </select> */}
                       <select
                         className="form-control w-full"
                         required
@@ -228,7 +214,8 @@ function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
                         }
                       >
                         <option value="Select">Select</option>
-                        {incTicketNumbers.map((incTicketNumber, i) => (
+                        <option value="Pending">Pending</option>
+                        {filteredIncTicketNumbers.map((incTicketNumber, i) => (
                           <option value={incTicketNumber} key={i}>
                             {incTicketNumber}
                           </option>

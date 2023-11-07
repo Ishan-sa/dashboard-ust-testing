@@ -64,7 +64,7 @@ router.get("/:incTicketNumber", async (req, res) => {
 router.get("/site/:siteID", async (req, res) => {
   if (exists(req?.params?.siteID)) {
     try {
-      const document = await TMO_Main.getTMOBySiteID(req.params.siteID);
+      const document = await TMO_Main.getAllTMOBySiteID(req.params.siteID);
       if (document !== null) {
         return res.json(document);
       }
