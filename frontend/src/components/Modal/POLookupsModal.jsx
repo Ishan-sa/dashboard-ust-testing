@@ -13,8 +13,6 @@ export default function POLookupsModal({
   const [formData, setFormData] = useState(new PO());
   const [error, setError] = useState(false);
   const [years, setYears] = useState([]);
-  const [combo, setCombo] = useState([]);
-  const [actualVal, setActualVal] = useState(0);
 
   const PORef = useRef(null);
   const QuantityRef = useRef(null);

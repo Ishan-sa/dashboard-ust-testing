@@ -1,4 +1,3 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import { BiSolidDownArrow } from "react-icons/bi";
@@ -16,6 +15,7 @@ import { makeEmptySchedule } from "../../lib/models/Schedule";
 function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
   const [formData, setFormData] = useState(makeEmptySchedule());
   const [incTicketNumbers, setIncTicketNumbers] = useState([]);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
     if (editingSite !== null) {
@@ -93,17 +93,30 @@ function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
     setError(false);
   };
 
-  const [error, setError] = useState(false);
+  // async function getIncTicketNumbersFromRTWP() {
+  //   const response = await fetch(`http://localhost:8888/tmo-main`);
+  //   const responseData = await response.json();
+  //   const incTicketNumbersFromMainTracker = responseData.map(
+  //     (site) => site.incTicketNumber
+  //   );
+  //   console.log(incTicketNumbersFromMainTracker);
+  //   setIncTicketNumbers(incTicketNumbersFromMainTracker);
+  // }
+
+  // useEffect(() => {
+  //   getIncTicketNumbersFromRTWP();
+  // }, []);
 
   async function getIncTicketNumbersFromRTWP() {
-    const response = await fetch("http://localhost:8888/tmo-main");
+    const response = await fetch(`http://localhost:8888/tmo-main`);
     const responseData = await response.json();
+    // if the status is set to closed, then don't fetch the inc ticket number of that site from the main tracker
+
     const incTicketNumbersFromMainTracker = responseData.map(
       (site) => site.incTicketNumber
     );
     console.log(incTicketNumbersFromMainTracker);
     setIncTicketNumbers(incTicketNumbersFromMainTracker);
-    // return response.data;
   }
 
   useEffect(() => {
@@ -122,6 +135,7 @@ function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
       >
         Add a site{" "}
       </Button>
+
       <form onSubmit={handleSubmit} className="w-full">
         <Modal show={show} onHide={handleClose} size="xl">
           <Modal.Header closeButton>
@@ -184,6 +198,24 @@ function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
                       INC Ticket
                     </label>
                     <div className="custom-select-wrapper">
+                      {/* <select
+                        className="form-control w-full"
+                        required
+                        value={formData.incTicketNumber}
+                        onChange={(e) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            incTicketNumber: e.target.value,
+                          }))
+                        }
+                      >
+                        <option value="Select">Select</option>
+                        {incTicketNumbers.map((incTicketNumber, i) => (
+                          <option value={incTicketNumber} key={i}>
+                            {incTicketNumber}
+                          </option>
+                        ))}
+                      </select> */}
                       <select
                         className="form-control w-full"
                         required
@@ -196,8 +228,8 @@ function SiteModal({ setSites, editingSite, show, handleClose, addSite }) {
                         }
                       >
                         <option value="Select">Select</option>
-                        {incTicketNumbers.map((incTicketNumber) => (
-                          <option value={incTicketNumber}>
+                        {incTicketNumbers.map((incTicketNumber, i) => (
+                          <option value={incTicketNumber} key={i}>
                             {incTicketNumber}
                           </option>
                         ))}

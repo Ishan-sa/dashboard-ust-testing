@@ -32,6 +32,15 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.post("/incTicketNumber", async (req, res) => {
+  try {
+    const document = await Schedule.lookup(req.body);
+    return res.status(201).json(document);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+});
+
 router.get("/:siteNumber", async (req, res) => {
   if (exists(req?.params?.siteNumber)) {
     try {

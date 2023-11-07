@@ -54,6 +54,10 @@ module.exports.getTMOByIncTicketNumber = async function (incTicketNumber) {
   return await TMO_MainModel.findOne({ incTicketNumber });
 };
 
+module.exports.getTMOBySiteID = async function (siteID) {
+  return await TMO_MainModel.findOne({ siteID });
+};
+
 module.exports.updateTMOByIncTicketNumber = async function (
   incTicketNumber,
   data

@@ -61,6 +61,19 @@ router.get("/:incTicketNumber", async (req, res) => {
   });
 });
 
+router.get("/site/:siteID", async (req, res) => {
+  if (exists(req?.params?.siteID)) {
+    try {
+      const document = await TMO_Main.getTMOBySiteID(req.params.siteID);
+      if (document !== null) {
+        return res.json(document);
+      }
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
+  }
+});
+
 router.patch("/:incTicketNumber", async (req, res) => {
   if (exists(req?.params?.incTicketNumber)) {
     try {
