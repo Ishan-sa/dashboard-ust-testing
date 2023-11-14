@@ -43,6 +43,16 @@ router.post("/lookup", async (req, res) => {
   }
 });
 
+// make another post route by the name of bulk-update to handle excel file upload
+router.post("/bulk-update", async (req, res) => {
+  try {
+    const document = await TMO_Main.bulkUpdate(req.body);
+    return res.status(200).json(document);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+});
+
 router.get("/:incTicketNumber", async (req, res) => {
   if (exists(req?.params?.incTicketNumber)) {
     try {

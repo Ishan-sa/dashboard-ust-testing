@@ -155,10 +155,29 @@ function makeRandomTMOTable() {
   };
 }
 
+function makeBulkUpdateTMOTable(dataArray) {
+  return dataArray.map((data) => {
+    return {
+      updateOne: {
+        filter: { incTicketNumber: data.incTicketNumber },
+        update: {
+          $set: {
+            assignedGroup: data.assignedGroup,
+            assignee: data.assignee,
+            dateReassigned: data.dateReassigned,
+            pierStatus: data.pierStatus,
+          },
+        },
+      },
+    };
+  });
+}
+
 module.exports = {
   makeTMOTable,
   makeEmptyTMOTable,
   makePartialTMOTable,
   makeRandomTMOTable,
   makePartialRegexTMOTable,
+  makeBulkUpdateTMOTable,
 };

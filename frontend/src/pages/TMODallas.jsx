@@ -138,7 +138,19 @@ export default function TMODallas() {
       return site;
     });
 
+    updatedSites.forEach((site) => {
+      fetch(`http://localhost:8888/tmo-main/${site.incTicketNumber}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(site),
+      });
+    });
     return updatedSites;
+
+    // After processing all excel data, iterate over updatedSites and set pierStatus to "Closed" for the sites that weren't updated and send the updated sites to the backend
+    // Send the updated sites to the backend
   }
 
   return (
@@ -169,6 +181,14 @@ export default function TMODallas() {
               onChange={handleExcelUpload}
             />
           </div>
+          {/* <div>
+            <input
+              type="file"
+              accept=".xlsx"
+              className="form-control"
+              onChange={handleTestExcelUpload}
+            />
+          </div> */}
         </div>
         <div className="flex">
           <TMODallasTable

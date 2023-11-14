@@ -79,3 +79,12 @@ module.exports.deleteTMOByIncTicketNumber = async function (incTicketNumber) {
 module.exports.lookup = async function (data) {
   return await TMO_MainModel.find(TMO_Main.makePartialRegexTMOTable(data));
 };
+
+module.exports.bulkUpdate = async function (dataArray) {
+  return await TMO_MainModel.bulkWrite(
+    TMO_Main.makeBulkUpdateTMOTable(dataArray),
+    {
+      ordered: false,
+    }
+  );
+};
