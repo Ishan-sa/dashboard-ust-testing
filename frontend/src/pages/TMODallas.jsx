@@ -148,9 +148,6 @@ export default function TMODallas() {
       });
     });
     return updatedSites;
-
-    // After processing all excel data, iterate over updatedSites and set pierStatus to "Closed" for the sites that weren't updated and send the updated sites to the backend
-    // Send the updated sites to the backend
   }
 
   return (
