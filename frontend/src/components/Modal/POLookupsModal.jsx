@@ -288,27 +288,6 @@ export default function POLookupsModal({
                       required
                     />
                   </td>
-                  {/* <td className="w-full">
-                    <label htmlFor="Actual" className="text-bold">
-                      Actual
-                    </label>
-                    <span className="text-danger">*</span>
-                    <input
-                      readOnly
-                      type="text"
-                      placeholder="Read Only"
-                      className="form-control w-full"
-                      onChange={(event) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          actual: event.target.value,
-                        }))
-                      }
-                      value={formData.actual}
-                      ref={ActualRef}
-                      required
-                    />
-                  </td> */}
                 </tr>
               </tbody>
             </table>

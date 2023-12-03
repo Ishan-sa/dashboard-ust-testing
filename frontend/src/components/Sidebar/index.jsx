@@ -22,6 +22,12 @@ const SideBar = () => {
             <p className="text-white">PO Lookups</p>
           </div>
         </NavLink>
+
+        <NavLink to="capex-report">
+          <div className="child-sidebar-container">
+            <p className="text-white">CAPEX Report</p>
+          </div>
+        </NavLink>
       </div>
     </>
   );

@@ -178,14 +178,6 @@ export default function TMODallas() {
               onChange={handleExcelUpload}
             />
           </div>
-          {/* <div>
-            <input
-              type="file"
-              accept=".xlsx"
-              className="form-control"
-              onChange={handleTestExcelUpload}
-            />
-          </div> */}
         </div>
         <div className="flex">
           <TMODallasTable

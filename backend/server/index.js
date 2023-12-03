@@ -7,6 +7,7 @@ const mongoose = require("mongoose");
 const siteRoute = require("./routes/sites");
 const tmoMainRoute = require("./routes/tmo-main");
 const poRoute = require("./routes/po-lookups");
+const capexReportRoute = require("./routes/capex-report");
 
 // import Schedule from "./models";
 
@@ -16,6 +17,7 @@ app.use(bodyParser.json());
 app.use("/sites", siteRoute);
 app.use("/tmo-main", tmoMainRoute);
 app.use("/po-lookups", poRoute);
+app.use("/capex-report", capexReportRoute);
 
 app.use((req, res, next) => {
   console.log(`Received ${req.method} request for ${req.url}`);
