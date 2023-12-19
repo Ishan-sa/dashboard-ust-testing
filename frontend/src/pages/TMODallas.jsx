@@ -138,6 +138,15 @@ export default function TMODallas() {
       return site;
     });
 
+    updatedSites.forEach((site) => {
+      fetch(`http://localhost:8888/tmo-main/${site.incTicketNumber}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(site),
+      });
+    });
     return updatedSites;
   }
 

@@ -9,29 +9,13 @@ export default function POLookupsModal({
   editingPo,
   show,
   handleClose,
-  setPO,
 }) {
   const [formData, setFormData] = useState(new PO());
   const [error, setError] = useState(false);
+  const [years, setYears] = useState([]);
 
   const PORef = useRef(null);
   const QuantityRef = useRef(null);
-  const ActualRef = useRef(null);
-
-  const options = [
-    { value: "Select", label: "Select" },
-    { value: "2020", label: "2020" },
-    { value: "2021", label: "2021" },
-    { value: "2022", label: "2022" },
-    { value: "2023", label: "2023" },
-    { value: "2024", label: "2024" },
-    { value: "2025", label: "2025" },
-    { value: "2026", label: "2026" },
-    { value: "2027", label: "2027" },
-    { value: "2028", label: "2028" },
-    { value: "2029", label: "2029" },
-    { value: "2030", label: "2030" },
-  ];
 
   const monthOptions = [
     { value: "Select", label: "Select" },
@@ -66,21 +50,6 @@ export default function POLookupsModal({
       return;
     }
 
-    const newPoData = {
-      ...formData,
-    };
-
-    // setPO((prevPO) => {
-    //   if (editingPo) {
-    //     const index = prevPO.findIndex((po) => po.po === editingPo.po);
-    //     const updatedPO = [...prevPO];
-    //     updatedPO[index] = newPoData;
-    //     return updatedPO;
-    //   } else {
-    //     return [...prevPO, newPoData];
-    //   }
-    // });
-
     try {
       if (editingPo !== null) {
         // editing logic
@@ -96,9 +65,22 @@ export default function POLookupsModal({
         );
         const responseData = await response.json();
         console.log("responseData from PO LOOKUP", responseData);
-        // setPO(responseData);
       } else {
         // adding logic
+        let month = monthToNumber(formData.month);
+        const tmoArray = await (
+          await fetch("http://localhost:8888/tmo-main/lookup", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              dateAssigned: formData.year + "-" + month,
+              xPEX: formData.activity,
+            }),
+          })
+        ).json();
+        formData.actual = tmoArray.length.toString();
         const response = await fetch("http://localhost:8888/po-lookups", {
           method: "POST",
           headers: {
@@ -106,6 +88,7 @@ export default function POLookupsModal({
           },
           body: JSON.stringify(formData),
         });
+        console.log("Added a PO", formData);
       }
     } catch (error) {
       console.log("Error saving data", error);
@@ -116,8 +99,47 @@ export default function POLookupsModal({
 
     // reset form data
     setFormData(new PO());
-    console.log("handleSubmit", formData);
   };
+
+  // handleSubmit ends here
+
+  async function getYearMonthXPEX() {
+    const response = await fetch("http://localhost:8888/tmo-main");
+    const data = await response.json();
+    const dateAssigned = data.map((item) => item.dateAssigned);
+    const months = dateAssigned.map((item) => item.slice(5, 7));
+    const xPEX = data.map((item) => item.xPEX);
+
+    // Create a Set to remove duplicates
+    const uniqueYears = new Set(dateAssigned.map((item) => item.slice(0, 4)));
+
+    // Convert Set back to an array
+    const yearsArray = [...uniqueYears];
+
+    setYears(yearsArray);
+  }
+
+  const monthToNumber = (monthName) => {
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    return String(months.indexOf(monthName) + 1).padStart(2, "0");
+  };
+
+  useEffect(() => {
+    getYearMonthXPEX();
+  }, []);
 
   return (
     <>
@@ -159,9 +181,10 @@ export default function POLookupsModal({
                         }
                         required
                       >
-                        {options.map((option) => (
-                          <option key={option.value} value={option.value}>
-                            {option.label}
+                        <option value="Select">Select</option>
+                        {years.map((year, index) => (
+                          <option key={index} value={year}>
+                            {year}
                           </option>
                         ))}
                       </select>
@@ -262,26 +285,6 @@ export default function POLookupsModal({
                         }))
                       }
                       ref={QuantityRef}
-                      required
-                    />
-                  </td>
-                  <td className="w-full">
-                    <label htmlFor="Actual" className="text-bold">
-                      Actual
-                    </label>
-                    <span className="text-danger">*</span>
-                    <input
-                      type="text"
-                      placeholder="Actual"
-                      className="form-control w-full"
-                      value={formData.actual}
-                      onChange={(event) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          actual: event.target.value,
-                        }))
-                      }
-                      ref={ActualRef}
                       required
                     />
                   </td>

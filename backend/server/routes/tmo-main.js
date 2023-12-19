@@ -4,6 +4,7 @@ const router = express.Router();
 const { exists } = require("../lib/helpers");
 const TMO_Main = require("../database/TMO-Main");
 const { makeRandomTMOTable } = require("../lib/models/TMO-Main");
+const { makePartialTMOTable } = require("../lib/models/TMO-Main");
 
 router.get("/randomTMO", async (req, res) => {
   try {
@@ -33,6 +34,25 @@ router.post("/", async (req, res) => {
   }
 });
 
+router.post("/lookup", async (req, res) => {
+  try {
+    const document = await TMO_Main.lookup(req.body);
+    return res.status(201).json(document);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+});
+
+// make another post route by the name of bulk-update to handle excel file upload
+router.post("/bulk-update", async (req, res) => {
+  try {
+    const document = await TMO_Main.bulkUpdate(req.body);
+    return res.status(200).json(document);
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }
+});
+
 router.get("/:incTicketNumber", async (req, res) => {
   if (exists(req?.params?.incTicketNumber)) {
     try {
@@ -49,6 +69,19 @@ router.get("/:incTicketNumber", async (req, res) => {
   return res.status(404).json({
     message: `TMO Main with incTicketNumber=${req.params.incTicketNumber} not found.`,
   });
+});
+
+router.get("/site/:siteID", async (req, res) => {
+  if (exists(req?.params?.siteID)) {
+    try {
+      const document = await TMO_Main.getAllTMOBySiteID(req.params.siteID);
+      if (document !== null) {
+        return res.json(document);
+      }
+    } catch (err) {
+      return res.status(500).json({ message: err.message });
+    }
+  }
 });
 
 router.patch("/:incTicketNumber", async (req, res) => {

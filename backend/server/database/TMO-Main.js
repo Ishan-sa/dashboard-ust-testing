@@ -54,6 +54,14 @@ module.exports.getTMOByIncTicketNumber = async function (incTicketNumber) {
   return await TMO_MainModel.findOne({ incTicketNumber });
 };
 
+module.exports.getTMOBySiteID = async function (siteID) {
+  return await TMO_MainModel.findOne({ siteID });
+};
+
+module.exports.getAllTMOBySiteID = async function (siteID) {
+  return await TMO_MainModel.find({ siteID });
+};
+
 module.exports.updateTMOByIncTicketNumber = async function (
   incTicketNumber,
   data
@@ -66,4 +74,17 @@ module.exports.updateTMOByIncTicketNumber = async function (
 
 module.exports.deleteTMOByIncTicketNumber = async function (incTicketNumber) {
   return await TMO_MainModel.findOneAndDelete({ incTicketNumber });
+};
+
+module.exports.lookup = async function (data) {
+  return await TMO_MainModel.find(TMO_Main.makePartialRegexTMOTable(data));
+};
+
+module.exports.bulkUpdate = async function (dataArray) {
+  return await TMO_MainModel.bulkWrite(
+    TMO_Main.makeBulkUpdateTMOTable(dataArray),
+    {
+      ordered: false,
+    }
+  );
 };

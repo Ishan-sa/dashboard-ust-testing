@@ -114,22 +114,6 @@ export default function TMODallasModal({
 
     handleClose();
 
-    // setSites((prevSites) => {
-    //   if (editingSite) {
-    //     // Editing logic
-    //     return prevSites.map((site) =>
-    //       site.incTicketNumber === editingSite.incTicketNumber
-    //         ? { ...editingSite, ...formData }
-    //         : site
-    //     );
-    //   } else {
-    //     // Adding a new site logic
-    //     return [newSiteData, ...prevSites];
-    //   }
-    // });
-
-    // handleClose();
-
     // reset form data
     setFormData({
       incTicketNumber: "",
@@ -165,7 +149,7 @@ export default function TMODallasModal({
     }
   });
 
-  const options = [
+  const caseOptions = [
     { value: "1", label: "1" },
     { value: "2", label: "2" },
     { value: "3", label: "3" },
@@ -390,24 +374,6 @@ export default function TMODallasModal({
                       }
                       required
                     />
-
-                    {/* <div className="custom-select-wrapper">
-                      <select
-                        className="form-control"
-                        value={formData.techAffected}
-                        onChange={(event) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            techAffected: event.target.value,
-                          }))
-                        }
-                        required
-                      >
-                        <option value="Manage Tech">Manage Tech</option>
-                        <option value="NA">NA</option>
-                      </select>
-                      <BiSolidDownArrow className="dropdown-icon" />
-                    </div> */}
                   </td>
 
                   {/* Sector */}
@@ -437,28 +403,6 @@ export default function TMODallasModal({
                       }
                       required
                     />
-
-                    {/* <div className="custom-select-wrapper">
-                      <select
-                        className="form-control"
-                        value={formData.sector}
-                        onChange={(event) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            sector: event.target.value,
-                          }))
-                        }
-                        required
-                      >
-                        <option value="A">A</option>
-                        <option value="B">B</option>
-                        <option value="C">C</option>
-                        <option value="D">D</option>
-                        <option value="E">E</option>
-                        <option value="F">F</option>
-                      </select>
-                      <BiSolidDownArrow className="dropdown-icon" />
-                    </div> */}
                   </td>
 
                   {/* Category */}
@@ -520,23 +464,6 @@ export default function TMODallasModal({
                       }
                       required
                     />
-
-                    {/* <div className="custom-select-wrapper">
-                      <select
-                        className="form-control"
-                        value={formData.mcpsEng}
-                        onChange={(event) =>
-                          setFormData((prev) => ({
-                            ...prev,
-                            mcpsEng: event.target.value,
-                          }))
-                        }
-                        required
-                      >
-                        <option value="Engineers">Engineers</option>
-                      </select>
-                      <BiSolidDownArrow className="dropdown-icon" />
-                    </div> */}
                   </td>
                 </tr>
 
@@ -573,7 +500,7 @@ export default function TMODallasModal({
                     <span className="text-danger">*</span>
 
                     <Select
-                      options={options}
+                      options={caseOptions}
                       components={animatedComponents}
                       isMulti
                       required

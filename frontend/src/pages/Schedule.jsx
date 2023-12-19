@@ -20,7 +20,7 @@ export default function Schedule() {
     const response = await fetch("http://localhost:8888/sites");
     /** @type {Schedule[]} */
     const data = await response.json();
-    console.log(data);
+    // console.log(data);
     setSites(data);
   };
 
